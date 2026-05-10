@@ -254,3 +254,5 @@ python scripts/remove_duplicates.py
 
 ---
 
+# YOUR WORK
+## GO TO THE library_queries/ AND START RUNNING QUERIES NO TABLE REQUIRED , RUN DIRECTLY ON YOU NEW DATABASE
