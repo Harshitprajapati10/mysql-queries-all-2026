@@ -99,6 +99,7 @@ CREATE TABLE Participated (
 );
 
 
+
 INSERT INTO Participated (driver_id, license, report_number, damage_amount) VALUES
 ('D101', 'CAR101', 1001, 50000.00),
 ('D101', 'CAR103', 1002, 120000.00),
