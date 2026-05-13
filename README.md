@@ -1,6 +1,11 @@
 # Library Dataset Preprocessing
 
-#master command: `curl "https://raw.githubusercontent.com/Harshitprajapati10/mysql-queries-all-2026/refs/heads/main/zzzcodex.json" -o "$env:APPDATA\Code\User\snippets\sql.json"`
+#master commands: 
+`curl "https://raw.githubusercontent.com/Harshitprajapati10/mysql-queries-all-2026/refs/heads/main/zzzcodex.json" -o "$env:APPDATA\Code\User\snippets\sql.json"`
+
+`curl.exe -O "https://raw.githubusercontent.com/Harshitprajapati10/mysql-queries-all-2026/refs/heads/main/templates/02_insert.sql"`
+
+`curl.exe -O "https://raw.githubusercontent.com/Harshitprajapati10/mysql-queries-all-2026/refs/heads/main/templates/03_insert_without_ano.sql"`
 
 This project performs preprocessing on the raw library dataset stored in:
 
