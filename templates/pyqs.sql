@@ -1,0 +1,799 @@
+
+-- pyq 2025 set2
+-- =========================================
+-- CREATE DATABASE
+-- =========================================
+
+CREATE DATABASE accident_db;
+USE accident_db;
+
+-- =========================================
+-- CREATE TABLES
+-- =========================================
+
+CREATE TABLE person (
+    driver_id INT PRIMARY KEY,
+    name VARCHAR(50),
+    address VARCHAR(100)
+);
+
+CREATE TABLE car (
+    license VARCHAR(20) PRIMARY KEY,
+    model VARCHAR(30),
+    year INT
+);
+
+CREATE TABLE accident (
+    report_number INT PRIMARY KEY,
+    accident_date DATE,
+    location VARCHAR(50)
+);
+
+CREATE TABLE owns (
+    driver_id INT,
+    license VARCHAR(20),
+
+    PRIMARY KEY(driver_id, license),
+
+    FOREIGN KEY(driver_id)
+    REFERENCES person(driver_id),
+
+    FOREIGN KEY(license)
+    REFERENCES car(license)
+);
+
+CREATE TABLE participated (
+    driver_id INT,
+    license VARCHAR(20),
+    report_number INT,
+    damage_amount INT,
+
+    PRIMARY KEY(driver_id, license, report_number),
+
+    FOREIGN KEY(driver_id)
+    REFERENCES person(driver_id),
+
+    FOREIGN KEY(license)
+    REFERENCES car(license),
+
+    FOREIGN KEY(report_number)
+    REFERENCES accident(report_number)
+);
+
+-- =========================================
+-- INSERT VALUES
+-- =========================================
+
+INSERT INTO person VALUES
+(1,'Rahul','Lucknow'),
+(2,'Aman','Delhi'),
+(3,'Priya','Kanpur'),
+(4,'Rohit','Lucknow'),
+(5,'Neha','Mumbai');
+
+INSERT INTO car VALUES
+('UP32A101','Hyundai',2020),
+('DL01B202','Honda',2019),
+('UP78C303','Suzuki',2021),
+('MH12D404','Hyundai',2022),
+('UP65E505','Toyota',2023);
+
+INSERT INTO accident VALUES
+(1001,'2024-01-10','Lucknow'),
+(1002,'2024-03-15','Delhi'),
+(1003,'2024-07-20','Lucknow'),
+(1004,'2023-11-11','Kanpur');
+
+INSERT INTO owns VALUES
+(1,'UP32A101'),
+(2,'DL01B202'),
+(3,'UP78C303'),
+(4,'MH12D404'),
+(5,'UP65E505');
+
+INSERT INTO participated VALUES
+(1,'UP32A101',1001,6000),
+(2,'DL01B202',1002,3000),
+(4,'MH12D404',1003,8000),
+(1,'UP32A101',1004,2000);
+
+-- =========================================
+-- (a) Total people who owned cars
+-- not involved in accidents in 2024
+-- =========================================
+
+SELECT COUNT(*)
+FROM owns
+WHERE license NOT IN (
+    SELECT license
+    FROM participated p
+    JOIN accident a
+    ON p.report_number = a.report_number
+    WHERE YEAR(a.accident_date)=2024
+);
+
+-- ANSWER = 2
+
+-- =========================================
+-- (b) Number of accidents
+-- involving Hyundai cars
+-- =========================================
+
+SELECT COUNT(*)
+FROM participated p
+JOIN car c
+ON p.license = c.license
+WHERE c.model='Hyundai';
+
+-- ANSWER = 3
+
+-- =========================================
+-- (c) Location having maximum accidents
+-- =========================================
+
+SELECT location, COUNT(*) AS total_accidents
+FROM accident
+GROUP BY location
+ORDER BY total_accidents DESC
+LIMIT 1;
+
+-- ANSWER = Lucknow
+
+-- =========================================
+-- (d) Year and location where
+-- damage amount > 5000
+-- =========================================
+
+SELECT YEAR(a.accident_date) AS year,
+       a.location
+FROM accident a
+JOIN participated p
+ON a.report_number = p.report_number
+WHERE p.damage_amount > 5000;
+
+-- ANSWER
+-- 2024 Lucknow
+-- 2024 Lucknow
+
+-- =========================================
+-- (e) Drivers who caused
+-- accident in Lucknow
+-- =========================================
+
+SELECT DISTINCT pe.name
+FROM person pe
+JOIN participated p
+ON pe.driver_id = p.driver_id
+JOIN accident a
+ON p.report_number = a.report_number
+WHERE a.location='Lucknow';
+
+-- ANSWER
+-- Rahul
+-- Rohit
+
+-- =========================================
+-- (f) Car models which never
+-- made accident
+-- =========================================
+
+SELECT model
+FROM car
+WHERE license NOT IN (
+    SELECT license
+    FROM participated
+);
+
+-- ANSWER
+-- Suzuki
+-- Toyota
+
+-- 2025 set 1
+-- =========================================
+-- CREATE DATABASE
+-- =========================================
+
+CREATE DATABASE accident_db;
+USE accident_db;
+
+-- =========================================
+-- CREATE TABLES
+-- =========================================
+
+CREATE TABLE person (
+    driver_id INT PRIMARY KEY,
+    name VARCHAR(50),
+    address VARCHAR(100)
+);
+
+CREATE TABLE car (
+    license VARCHAR(20) PRIMARY KEY,
+    model VARCHAR(30),
+    year INT
+);
+
+CREATE TABLE accident (
+    report_number INT PRIMARY KEY,
+    accident_date DATE,
+    location VARCHAR(50)
+);
+
+CREATE TABLE owns (
+    driver_id INT,
+    license VARCHAR(20),
+
+    PRIMARY KEY(driver_id, license),
+
+    FOREIGN KEY(driver_id)
+    REFERENCES person(driver_id),
+
+    FOREIGN KEY(license)
+    REFERENCES car(license)
+);
+
+CREATE TABLE participated (
+    driver_id INT,
+    license VARCHAR(20),
+    report_number INT,
+    damage_amount INT,
+
+    PRIMARY KEY(driver_id, license, report_number),
+
+    FOREIGN KEY(driver_id)
+    REFERENCES person(driver_id),
+
+    FOREIGN KEY(license)
+    REFERENCES car(license),
+
+    FOREIGN KEY(report_number)
+    REFERENCES accident(report_number)
+);
+
+-- =========================================
+-- INSERT VALUES
+-- =========================================
+
+INSERT INTO person VALUES
+(1,'Steve Joes','Lucknow'),
+(2,'Aman','Delhi'),
+(3,'Priya','Kanpur'),
+(4,'Rohit','Mumbai'),
+(5,'Neha','Pune');
+
+INSERT INTO car VALUES
+('UP32A101','Hyundai',2020),
+('DL01B202','Honda',2019),
+('UP78C303','Suzuki',2021),
+('MH12D404','Toyota',2022),
+('UP65E505','BMW',2023);
+
+INSERT INTO accident VALUES
+(1001,'2024-01-10','Lucknow'),
+(1002,'2024-03-15','Delhi'),
+(1003,'2023-07-20','Kanpur'),
+(1004,'2022-11-11','Mumbai');
+
+INSERT INTO owns VALUES
+(1,'UP32A101'),
+(2,'DL01B202'),
+(3,'UP78C303'),
+(4,'MH12D404'),
+(5,'UP65E505');
+
+INSERT INTO participated VALUES
+(1,'UP32A101',1001,6000),
+(1,'UP32A101',1003,8000),
+(2,'DL01B202',1002,3000),
+(4,'MH12D404',1004,10000);
+
+-- =========================================
+-- (a) Total number of people who owned cars
+-- involved in accidents in 2024
+-- =========================================
+
+SELECT COUNT(DISTINCT driver_id)
+FROM participated p
+JOIN accident a
+ON p.report_number = a.report_number
+WHERE YEAR(a.accident_date)=2024;
+
+-- ANSWER = 2
+
+-- =========================================
+-- (b) Add a new accident
+-- =========================================
+
+INSERT INTO accident VALUES
+(1005,'2025-05-10','Varanasi');
+
+-- =========================================
+-- (c) Number of accidents in which
+-- Steve Joes cars were involved
+-- =========================================
+
+SELECT COUNT(*)
+FROM participated p
+JOIN person pe
+ON p.driver_id = pe.driver_id
+WHERE pe.name='Steve Joes';
+
+-- ANSWER = 2
+
+-- =========================================
+-- (d) Car model and location where
+-- damage amount is highest
+-- =========================================
+
+SELECT c.model, a.location
+FROM participated p
+JOIN car c
+ON p.license = c.license
+JOIN accident a
+ON p.report_number = a.report_number
+WHERE p.damage_amount = (
+    SELECT MAX(damage_amount)
+    FROM participated
+);
+
+-- ANSWER
+-- Toyota   Mumbai
+
+-- =========================================
+-- (e) Drivers who did not make
+-- any accident
+-- =========================================
+
+SELECT name
+FROM person
+WHERE driver_id NOT IN (
+    SELECT driver_id
+    FROM participated
+);
+
+-- ANSWER
+-- Priya
+-- Neha
+
+-- =========================================
+-- (f) Car models damaged by accident
+-- during last five years
+-- =========================================
+
+SELECT DISTINCT c.model
+FROM car c
+JOIN participated p
+ON c.license = p.license
+JOIN accident a
+ON p.report_number = a.report_number
+WHERE YEAR(a.accident_date) >= YEAR(CURDATE())-5;
+
+-- ANSWER
+-- Hyundai
+-- Honda
+-- Toyota
+
+-- 2024 pyq
+
+-- =========================================
+-- CREATE DATABASE
+-- =========================================
+
+CREATE DATABASE property_db;
+USE property_db;
+
+-- =========================================
+-- CREATE TABLES
+-- =========================================
+
+CREATE TABLE branch (
+    branchNo VARCHAR(10) PRIMARY KEY,
+    city VARCHAR(30)
+);
+
+CREATE TABLE staff (
+    staffNo VARCHAR(10) PRIMARY KEY,
+    name VARCHAR(50),
+    position VARCHAR(30),
+    gender VARCHAR(10),
+    DOB DATE,
+    salary INT,
+    branchNo VARCHAR(10),
+
+    FOREIGN KEY(branchNo)
+    REFERENCES branch(branchNo)
+);
+
+CREATE TABLE owner (
+    ownerNo VARCHAR(10) PRIMARY KEY,
+    name VARCHAR(50),
+    address VARCHAR(100),
+    contact_no VARCHAR(15)
+);
+
+CREATE TABLE property (
+    propertyNo VARCHAR(10) PRIMARY KEY,
+    city VARCHAR(30),
+    type VARCHAR(20),
+    rent INT,
+    ownerNo VARCHAR(10),
+    staffNo VARCHAR(10),
+    branchNo VARCHAR(10),
+
+    FOREIGN KEY(ownerNo)
+    REFERENCES owner(ownerNo),
+
+    FOREIGN KEY(staffNo)
+    REFERENCES staff(staffNo),
+
+    FOREIGN KEY(branchNo)
+    REFERENCES branch(branchNo)
+);
+
+-- =========================================
+-- INSERT VALUES
+-- =========================================
+
+INSERT INTO branch VALUES
+('BR001','Mumbai'),
+('BR002','Delhi'),
+('BR003','Kolkata'),
+('BR004','Lucknow');
+
+INSERT INTO staff VALUES
+('S001','Aman','Manager','Male','1990-05-10',90000,'BR001'),
+('S002','Priya','Supervisor','Female','1992-08-12',60000,'BR002'),
+('S003','Rahul','Manager','Male','1988-04-15',85000,'BR003'),
+('S004','Neha','Assistant','Female','1995-06-20',40000,'BR004'),
+('S005','Rohit','Supervisor','Male','1991-02-25',50000,'BR003');
+
+INSERT INTO owner VALUES
+('O001','Raj','Lucknow, UP','9876543210'),
+('O002','Simran','Delhi, India','9876501234'),
+('O003','Karan','Mumbai, MH','9999988888');
+
+INSERT INTO property VALUES
+('P001','Mumbai','Flat',3500,'O001','S001','BR001'),
+('P002','Delhi','House',5000,'O002','S002','BR002'),
+('P003','Kolkata','Flat',2500,'O003','S003','BR003'),
+('P004','Lucknow','House',4500,'O001','S004','BR004'),
+('P005','Mumbai','Flat',3000,'O003','S005','BR001');
+
+-- =========================================
+-- 1. Male staff working in Mumbai
+-- with salary > 80000
+-- =========================================
+
+SELECT s.*
+FROM staff s
+JOIN branch b
+ON s.branchNo = b.branchNo
+WHERE s.gender='Male'
+AND b.city='Mumbai'
+AND s.salary > 80000;
+
+-- ANSWER
+-- Aman
+
+-- =========================================
+-- 2. Male managers working in
+-- New Delhi or Kolkata
+-- =========================================
+
+SELECT s.*
+FROM staff s
+JOIN branch b
+ON s.branchNo = b.branchNo
+WHERE s.gender='Male'
+AND s.position='Manager'
+AND b.city IN ('New Delhi','Kolkata');
+
+-- ANSWER
+-- Rahul
+
+-- =========================================
+-- 3. Flats with rent below 4000
+-- in ascending order
+-- =========================================
+
+SELECT *
+FROM property
+WHERE type='Flat'
+AND rent < 4000
+ORDER BY rent ASC;
+
+-- ANSWER
+-- P003
+-- P005
+-- P001
+
+-- =========================================
+-- 4. Owners having 'Lucknow'
+-- in address
+-- =========================================
+
+SELECT *
+FROM owner
+WHERE address LIKE '%Lucknow%';
+
+-- ANSWER
+-- Raj
+
+-- =========================================
+-- 5. Total salary of all male staff
+-- =========================================
+
+SELECT SUM(salary) AS total_salary
+FROM staff
+WHERE gender='Male';
+
+-- ANSWER = 225000
+
+-- =========================================
+-- 6. Number of properties having
+-- rent > 3500
+-- =========================================
+
+SELECT COUNT(*) AS total_properties
+FROM property
+WHERE rent > 3500;
+
+-- ANSWER = 2
+
+-- =========================================
+-- 7. Total number of managers
+-- and sum of their salaries
+-- =========================================
+
+SELECT COUNT(*) AS total_managers,
+       SUM(salary) AS total_salary
+FROM staff
+WHERE position='Manager';
+
+-- ANSWER
+-- total_managers = 2
+-- total_salary = 175000
+
+-- =========================================
+-- 8. Staff names having salary
+-- greater than average salary
+-- of branch BR003
+-- =========================================
+
+SELECT name
+FROM staff
+WHERE salary > (
+    SELECT AVG(salary)
+    FROM staff
+    WHERE branchNo='BR003'
+);
+
+-- ANSWER
+-- Aman
+
+-- =========================================
+-- 9. Give all managers
+-- a 5% pay increase
+-- =========================================
+
+UPDATE staff
+SET salary = salary + (salary * 0.05)
+WHERE position='Manager';
+
+-- CHECK UPDATED SALARY
+
+SELECT name, salary
+FROM staff
+WHERE position='Manager';
+
+-- UPDATED ANSWER
+-- Aman  = 94500
+-- Rahul = 89250
+
+-- 2023 pyq
+-- =========================================
+-- CREATE DATABASE
+-- =========================================
+
+CREATE DATABASE college_db;
+USE college_db;
+
+-- =========================================
+-- CREATE TABLES
+-- =========================================
+
+CREATE TABLE student (
+    sid INT PRIMARY KEY,
+    sname VARCHAR(50),
+    gender VARCHAR(10),
+    age INT,
+    gpa DECIMAL(3,1)
+);
+
+CREATE TABLE professor (
+    prof_ssn INT PRIMARY KEY,
+    prof_name VARCHAR(50),
+    age INT,
+    city VARCHAR(30),
+    salary INT
+);
+
+CREATE TABLE department (
+    dept_name VARCHAR(50) PRIMARY KEY,
+    hod_ssn INT,
+    dept_email VARCHAR(50),
+    year_of_establishment INT,
+
+    FOREIGN KEY(hod_ssn)
+    REFERENCES professor(prof_ssn)
+);
+
+CREATE TABLE course (
+    course_no VARCHAR(10) PRIMARY KEY,
+    cname VARCHAR(50),
+    dname VARCHAR(50),
+    prof_ssn INT,
+
+    FOREIGN KEY(dname)
+    REFERENCES department(dept_name),
+
+    FOREIGN KEY(prof_ssn)
+    REFERENCES professor(prof_ssn)
+);
+
+CREATE TABLE enroll (
+    sid INT,
+    dept_name VARCHAR(50),
+    course_no VARCHAR(10),
+
+    FOREIGN KEY(sid)
+    REFERENCES student(sid),
+
+    FOREIGN KEY(dept_name)
+    REFERENCES department(dept_name),
+
+    FOREIGN KEY(course_no)
+    REFERENCES course(course_no)
+);
+
+-- =========================================
+-- INSERT VALUES
+-- =========================================
+
+INSERT INTO student VALUES
+(1,'Aman','Male',22,8.5),
+(2,'Priya','Female',21,9.1),
+(3,'Rahul','Male',24,7.8),
+(4,'Neha','Female',23,8.9),
+(5,'Rohit','Male',20,7.5);
+
+INSERT INTO professor VALUES
+(101,'Amit',45,'Delhi',90000),
+(102,'Rakesh',50,'Mumbai',85000),
+(103,'Anil',40,'Lucknow',80000),
+(104,'Suresh',48,'Kolkata',87000);
+
+INSERT INTO department VALUES
+('Computer Science',101,'cs@gmail.com',2000),
+('Civil Engineering',102,'civil@gmail.com',1998),
+('Mechanical',103,'mech@gmail.com',1995);
+
+INSERT INTO course VALUES
+('C101','DBMS','Computer Science',101),
+('C102','OS','Computer Science',103),
+('C201','Surveying','Civil Engineering',102),
+('C202','Structure','Civil Engineering',104),
+('C301','Thermodynamics','Mechanical',103);
+
+INSERT INTO enroll VALUES
+(1,'Computer Science','C101'),
+(1,'Civil Engineering','C201'),
+(2,'Civil Engineering','C202'),
+(3,'Computer Science','C102'),
+(4,'Civil Engineering','C201'),
+(5,'Mechanical','C301');
+
+-- =========================================
+-- 1. Professors who teach only
+-- for Computer Science department
+-- and name starts with A
+-- =========================================
+
+SELECT DISTINCT p.prof_name
+FROM professor p
+JOIN course c
+ON p.prof_ssn = c.prof_ssn
+WHERE c.dname='Computer Science'
+AND p.prof_name LIKE 'A%';
+
+-- ANSWER
+-- Amit
+-- Anil
+
+-- =========================================
+-- 2. Male students taking both
+-- Civil Engineering and
+-- Computer Science course
+-- =========================================
+
+SELECT DISTINCT s.sname
+FROM student s
+JOIN enroll e1
+ON s.sid = e1.sid
+JOIN enroll e2
+ON s.sid = e2.sid
+WHERE s.gender='Male'
+AND e1.dept_name='Civil Engineering'
+AND e2.dept_name='Computer Science';
+
+-- ANSWER
+-- Aman
+
+-- =========================================
+-- 3. sid, name and gpa of female
+-- students age <=23 taking
+-- Civil Engineering courses
+-- =========================================
+
+SELECT s.sid, s.sname, s.gpa
+FROM student s
+JOIN enroll e
+ON s.sid = e.sid
+WHERE s.gender='Female'
+AND s.age <= 23
+AND e.dept_name='Civil Engineering';
+
+-- ANSWER
+-- 2 Priya 9.1
+-- 4 Neha 8.9
+
+-- =========================================
+-- 4. Department having
+-- maximum male students
+-- =========================================
+
+SELECT dept_name, COUNT(*) AS total_males
+FROM enroll e
+JOIN student s
+ON e.sid = s.sid
+WHERE s.gender='Male'
+GROUP BY dept_name
+ORDER BY total_males DESC
+LIMIT 1;
+
+-- ANSWER
+-- Computer Science
+
+-- =========================================
+-- 5. Department and HOD name
+-- offering minimum number of courses
+-- =========================================
+
+SELECT d.dept_name, p.prof_name
+FROM department d
+JOIN professor p
+ON d.hod_ssn = p.prof_ssn
+JOIN course c
+ON d.dept_name = c.dname
+GROUP BY d.dept_name, p.prof_name
+ORDER BY COUNT(c.course_no) ASC
+LIMIT 1;
+
+-- ANSWER
+-- Mechanical   Anil
+
+-- =========================================
+-- 6. Civil Engineering course number,
+-- course name and professor name
+-- =========================================
+
+SELECT c.course_no,
+       c.cname,
+       p.prof_name
+FROM course c
+JOIN professor p
+ON c.prof_ssn = p.prof_ssn
+WHERE c.dname='Civil Engineering';
+
+-- ANSWER
+-- C201 Surveying Rakesh
+-- C202 Structure Suresh
